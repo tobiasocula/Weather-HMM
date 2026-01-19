@@ -1,0 +1,667 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      
+        <link rel="next" href="Continuous_HMM/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>NAME OF PROJECT</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#the-baum-welch-algorithm-for-the-weather-system-hmm" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="NAME OF PROJECT" class="md-header__button md-logo" aria-label="NAME OF PROJECT" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            NAME OF PROJECT
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Home
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="NAME OF PROJECT" class="md-nav__button md-logo" aria-label="NAME OF PROJECT" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    NAME OF PROJECT
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-baum-welch-algorithm-for-the-weather-system-hmm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Baum-Welch algorithm for the weather-system HMM
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Baum-Welch algorithm for the weather-system HMM">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#expectation-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expectation Step
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Expectation Step">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#forward-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Forward algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backward-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backward algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#maximization-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maximization Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluating-the-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluating the model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Evaluating the model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#viterbi-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Viterbi algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#predictions-when-future-observations-are-unknown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Predictions when future observations are unknown
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Continuous_HMM/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Continuous HMM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-baum-welch-algorithm-for-the-weather-system-hmm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Baum-Welch algorithm for the weather-system HMM
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Baum-Welch algorithm for the weather-system HMM">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#expectation-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expectation Step
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Expectation Step">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#forward-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Forward algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backward-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backward algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#maximization-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maximization Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluating-the-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluating the model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Evaluating the model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#viterbi-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Viterbi algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#predictions-when-future-observations-are-unknown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Predictions when future observations are unknown
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>Home</h1>
+
+<h3 id="the-baum-welch-algorithm-for-the-weather-system-hmm">The Baum-Welch algorithm for the weather-system HMM</h3>
+<p>Given a hidden Markov-chain (HMM), consisting of a set of states (which are hidden) and observations, the goal is to estimate the parameters of the system. Here, the parameter set consists of the transition matrix <span class="arithmatex">\(A\)</span>, the emission matrix <span class="arithmatex">\(B\)</span> and the initial starting probabilities <span class="arithmatex">\(\pi\)</span>. If <span class="arithmatex">\(N\)</span> is the amount of states, <span class="arithmatex">\(M\)</span> the amount of possible observations in each timestamp and <span class="arithmatex">\(T\)</span> the amount of timestamps of the system (discrete integers), then <span class="arithmatex">\(A\)</span> is a <span class="arithmatex">\(N\times N\)</span> matrix where <span class="arithmatex">\(a_{i,j}=\mathbb{P}(S_{t+1}=j\ |\ S_t=i\text{ for all }t)\)</span> (being the probability that the next state <span class="arithmatex">\(S_{t+1}\)</span> will be <span class="arithmatex">\(j\)</span> given the current state <span class="arithmatex">\(i\)</span>), <span class="arithmatex">\(B\)</span> is a <span class="arithmatex">\(N\times M\)</span> matrix where <span class="arithmatex">\(b_{i,k}=b_i(O_t)=\mathbb{P}(O_t=k\ |\ S_t=i\text{ for all }t)\)</span> (being the probability that we observe <span class="arithmatex">\(O_t\)</span> to be k given that we are in state <span class="arithmatex">\(i\)</span>) and <span class="arithmatex">\(\pi\)</span> is a vector of length <span class="arithmatex">\(N\)</span> where <span class="arithmatex">\(\pi_i=\mathbb{P}(S_1=i)\)</span> (being the probability that the HMM started in state <span class="arithmatex">\(i\)</span>).</p>
+<p>The first step in the algorithm is making a guess for the values of <span class="arithmatex">\(A\)</span>, <span class="arithmatex">\(B\)</span> and <span class="arithmatex">\(\pi\)</span> to initialize them.</p>
+<h4 id="expectation-step">Expectation Step</h4>
+<p>The second step is called the expectation-step, where we estimate the probability that the observations that we saw came from the parameters <span class="arithmatex">\(\theta=(A,B,\pi)\)</span> that we currently have.</p>
+<p>This step consists of the so-called forward and backward algorithm.</p>
+<h5 id="forward-algorithm">Forward algorithm</h5>
+<p>In the forward algorithm, we estimate the probability that the observed sequence of the HMM from <span class="arithmatex">\(t=1\)</span> to <span class="arithmatex">\(t=t\)</span>, ended in state <span class="arithmatex">\(i\)</span>, we denote this by <span class="arithmatex">\(\alpha_t(i)=\mathbb{P}(O_1,...,O_t,S_t=i)\)</span>. For this, we first initialize <span class="arithmatex">\(\alpha_1(i)=\pi_i b_i(O_1)\)</span>, (the probability that we were in state <span class="arithmatex">\(i\)</span> at the beginning times the probability that the first observation (<span class="arithmatex">\(O_1\)</span>) occured during state <span class="arithmatex">\(i\)</span>). Then, we compute<br />
+<span class="arithmatex">\(\alpha_t(j)=b_j(O_t)\sum_i\alpha_{t-1}(i)a_{i,j}\)</span><br />
+recursively. So we consider all ways to reach state <span class="arithmatex">\(j\)</span> from previous states <span class="arithmatex">\(\alpha_{t-1}(i)a_{i,j}\)</span> multiplied by the probability of seeing observation <span class="arithmatex">\(O_t\)</span> in state <span class="arithmatex">\(j\)</span>.</p>
+<h5 id="backward-algorithm">Backward algorithm</h5>
+<p>In the backward algorithm, we do the opposite: we estimate the probability of observing the future from <span class="arithmatex">\(t=t+1\)</span> onward, given state <span class="arithmatex">\(i\)</span> at time <span class="arithmatex">\(t\)</span>. We denote this by <span class="arithmatex">\(\beta_t(i)=\mathbb{P}(O_{t+1},...,O_T\ |\ S_t=i)\)</span>. We initialize <span class="arithmatex">\(\beta_T(i)=1\)</span> (since there is no future at <span class="arithmatex">\(t=T\)</span>), and then we compute recursively again:<br />
+<span class="arithmatex">\(\beta_t(i)=\sum_j a_{i,j}b_j(O_{t+1})\beta_{t+1}(j)\)</span><br />
+So here we are considering the sum over all possible future states <span class="arithmatex">\(j\)</span> (the sum of the product of the probability of moving from state <span class="arithmatex">\(i\)</span> to <span class="arithmatex">\(j\)</span> times the probability of observing <span class="arithmatex">\(O_{t+1}\)</span> during state <span class="arithmatex">\(j\)</span> times the probability of having gotten to the next state <span class="arithmatex">\(S_{t+1}\)</span>).</p>
+<p>Next, we compute <span class="arithmatex">\(\gamma\in\mathbb{R}^{T\times N}\)</span> where <span class="arithmatex">\(\gamma_t(i)=\mathbb{P}(S_t=i\ |\ O_1,...,O_T)\)</span> (the probability that we were in state <span class="arithmatex">\(i\)</span> at time <span class="arithmatex">\(t\)</span> given the observations), by<br />
+<span class="arithmatex">\(\gamma_t(i)=\frac{\alpha_t(i)\beta_t(i)}{\sum_j\alpha_t(j)\beta_t(j)}\)</span><br />
+The way we get this formula, is by transforming the formula for gamma: <span class="arithmatex">\(\gamma_t(i)=\mathbb{P}(S_t=i\ |\ O_1,...,O_T)=\mathbb{P}(S_t=i,O_1,...,O_T)/\mathbb{P}(O_1,...,O_T)\)</span> and splitting <span class="arithmatex">\(O_1,...,O_T\)</span> into <span class="arithmatex">\(O_1,...,O_t\)</span> and <span class="arithmatex">\(O_{t+1},...,O_T\)</span> for each <span class="arithmatex">\(t\)</span>, and because <span class="arithmatex">\(\mathbb{P}(S_t=i,O_1,...,O_t)=\alpha_t(i)\)</span> and <span class="arithmatex">\(\mathbb{P}(S_t=i,O_{t+1},...,O_T)=\beta_t(i)\)</span> we get the formula for the numerator. The formula for the denominator follows from the fact that <span class="arithmatex">\(\mathbb{P}(O_1,...,O_T)\)</span> is just the sum over all states <span class="arithmatex">\(j\)</span> of <span class="arithmatex">\(\alpha_t(j)\beta_t(j)\)</span> (we are considering the probability of having seen the given observations, no matter the end state).</p>
+<p>Then we compute <span class="arithmatex">\(\xi\in\mathbb{R}^{T\times N\times N}\)</span> where <span class="arithmatex">\(\xi_t(i,j)=\mathbb{P}(S_t=i,S_{t+1}=j\ |\ O_1,...,O_T)\)</span> (the probability that we were in state <span class="arithmatex">\(i\)</span> at time <span class="arithmatex">\(t\)</span> and that the next state <span class="arithmatex">\(S_{t+1}\)</span> will be <span class="arithmatex">\(j\)</span>, given the observations), by<br />
+<span class="arithmatex">\(\xi_t(i,j)=\frac{\alpha_t(i)a_{i,j}b_j(O_{t+1})\beta_{t+1}(j)}{\sum_{k,l}\alpha_t(k)a_{k,l}b_l(O_{t+1})\beta_{t+1}(l)}\)</span><br />
+We obtain this equation by further developing the formula for xi: <span class="arithmatex">\(\xi_t(i,j)=\mathbb{P}(S_t=i,S_{t+1}=j\ |\ O_1,...,O_T)=\mathbb{P}(S_t=i,S_{t+1}=j,O_1,...,O_T)/\mathbb{P}(O_1,...,O_T)\)</span><br />
+In the numerator, <span class="arithmatex">\(\mathbb{P}(S_t=i,S_{t+1}=j,O_1,...,O_T)=\alpha_t(i)a_{i,j}b_j(O_{t+1})\beta_{t+1}(j)\)</span>, we count the probability of having gotten to state <span class="arithmatex">\(i\)</span> at time <span class="arithmatex">\(t\)</span> whilst having transitioned into the next state <span class="arithmatex">\(j\)</span>, whilst also having observed state <span class="arithmatex">\(j\)</span> at time <span class="arithmatex">\(t+1\)</span>, multiplied by the probability of observing <span class="arithmatex">\(O_{t+1},...,O_T\)</span> in the future (being <span class="arithmatex">\(\beta_{t+1}(j)\)</span>). In the denominator, we simply compute the same but summing over all possible states <span class="arithmatex">\(k,l\)</span>, accounting for the probability of having seen the observations no matter the (next) state of time <span class="arithmatex">\(t\)</span>.</p>
+<h4 id="maximization-step">Maximization Step</h4>
+<p>In the third step, the maximization step, we update the parameters <span class="arithmatex">\(\theta=(A,B,\pi)\)</span> using the estimated probabilities from the previous step.<br />
+We compute the values for <span class="arithmatex">\(A\)</span> by:<br />
+<span class="arithmatex">\(a_{i,j}=\frac{\sum_{t}^{T-1}\xi_t(i,j)}{\sum_{t}^{T-1}\gamma_t(i)}\)</span><br />
+So this is the ratio between every time we were in state <span class="arithmatex">\(i\)</span> AND when the next state was <span class="arithmatex">\(j\)</span>, to every time we were in state <span class="arithmatex">\(i\)</span>.<br />
+We then compute the values for <span class="arithmatex">\(B\)</span> by:<br />
+<span class="arithmatex">\(b_{i,k}=\frac{\sum_{t}^T\gamma_t(i)(1\text{ if }O_t=k\text{ else }0)}{\sum_{t}^T\gamma_t(i)}\)</span><br />
+So this is the ratio between every time we were in state <span class="arithmatex">\(i\)</span> AND when we observed observation <span class="arithmatex">\(k\)</span> at time <span class="arithmatex">\(t\)</span>, to every time we were in state <span class="arithmatex">\(i\)</span>.</p>
+<p>We then repeat this procedure by going back to step 2. The algorithm will converge to a local extremum, but not necessarily the global optimum.<br />
+We can also compute the log-likelyhood of the system: <span class="arithmatex">\(\text{log}\sum_i\alpha_T(i)\)</span>. This will give a measure of certainty of the estimation of the parameters. This represents the log of the fraction of observation data that gets explained by the estimated parameters. The algorithm will converge to a certain value of this log-likelyhood and we detect how much this changes during every iteration step.<br />
+My implementation for the weather HMM will run the algorithm multiple times and then store every log-likelyhood and parameter instance estimated, and then compare.</p>
+<h4 id="evaluating-the-model">Evaluating the model</h4>
+<p>After every time we run the training, meaning we exit if the desired error tolerance is reached or if too many attempts have been used, we first have to "align" the predicted parameters <span class="arithmatex">\(A\)</span>, <span class="arithmatex">\(B\)</span> and <span class="arithmatex">\(\pi\)</span> in the right direction.<br />
+The reason we have to do this is because when the model constructs the parameters, it predicts the values for <span class="arithmatex">\(A\)</span>, <span class="arithmatex">\(B\)</span> and <span class="arithmatex">\(\pi\)</span> up to a permutation only. Applying a different permutation to <span class="arithmatex">\(A\)</span>, <span class="arithmatex">\(B\)</span> and <span class="arithmatex">\(\pi\)</span> gives the same likelyhood of the data.<br />
+We therefor use the Hungarian method to find a best-fit assignment between the real values of the parameters and the estimated parameters, which corresponds to finding a correct permutation for the parameters.</p>
+<p>https://en.wikipedia.org/wiki/Hungarian_algorithm</p>
+<p>After having done this, I test the model on "future" data (not really future, since it's all synthetic), in two different ways.</p>
+<h5 id="viterbi-algorithm">Viterbi algorithm</h5>
+<p>I first assume the model has access to the future observation sequence, and I will test the model on its ability to generalize on estimating the underlying state sequence.</p>
+<p>https://en.wikipedia.org/wiki/Viterbi_algorithm</p>
+<p>For this, I store two structures <span class="arithmatex">\(\delta,\psi\in\mathbb{R}^{T\times N}\)</span>, where <span class="arithmatex">\(\delta_t(i)\)</span> represents the maximum probability, over all possible state sequences, of seeing these states under the respected observation states, where the state at time <span class="arithmatex">\(t-1\)</span> ends in <span class="arithmatex">\(i\)</span>, given the estimated parameters. So  <br />
+<span class="arithmatex">\(\delta_t(i)=\underset{S_0,...,S_{t-1}}\max\mathbb{P}(S_0,S_1,...,S_{t-1}=i,O_1,...,O_T\ |\ \theta)\)</span><br />
+I initialize <span class="arithmatex">\(\delta_1(i)=\pi_ib_i(O_1)\)</span> and then run over all future timestamps <span class="arithmatex">\(t=T+1\)</span> until <span class="arithmatex">\(t=T_{\text{tend}}\)</span>, where I calculate dynamically:<br />
+<span class="arithmatex">\(\delta_t(i)=\underset{j}\max(\delta_{t-1}(j)a_{i,j})b_i(O_t)\)</span><br />
+So we compute the maximum probability of the previous timestamp multiplied by the transition probability, multiplied by the probability that we observed <span class="arithmatex">\(O_t\)</span>.<br />
+We also store<br />
+<span class="arithmatex">\(\psi_t(i) = \underset{j}{\mathrm{argmax}}\ \delta_{t-1}(j)a_{i,j}\)</span><br />
+which is the state <span class="arithmatex">\(j\)</span>, which given that the maximum probability path ended in state <span class="arithmatex">\(i\)</span>, is the most likely to have preceded state <span class="arithmatex">\(i\)</span> at time <span class="arithmatex">\(t-1\)</span>.<br />
+Next, we initialize the predicted state sequence by setting<br />
+<span class="arithmatex">\(S_{T_{\text{end}}}=\underset{j}{\mathrm{argmax}}\ \delta_{T_{\text{end}}}(j)\)</span><br />
+and then iterate backwards:<br />
+<span class="arithmatex">\(S_t=\psi_{t+1}(S_{t+1})\)</span></p>
+<h5 id="predictions-when-future-observations-are-unknown">Predictions when future observations are unknown</h5>
+<p>We also wish to evaluate the model on future data, assuming the current timestamp is <span class="arithmatex">\(t=T\)</span> and we don't have knowledge of the future observations, like we did with the Viterbi algorithm.<br />
+For evaluating this, we will compute two arrays, namely the predicted state- and observation sequence.<br />
+We will iterate over all future timestamps, from <span class="arithmatex">\(t=T\)</span> to <span class="arithmatex">\(t=T_{\text{end}}\)</span>, and compute the predicted states and observations from the previous values (dynamic programming). We denote <span class="arithmatex">\(\bar{S}_{t}\)</span> for the predicted state at time <span class="arithmatex">\(t\)</span> and <span class="arithmatex">\(\bar{O}_{t}\)</span> for the predicted observation at time <span class="arithmatex">\(t\)</span>.</p>
+<p>We initialize:</p>
+<p><span class="arithmatex">\(\bar{S}_{T+1}=\underset{j}{\mathrm{argmax}}\ \gamma_T(j)\)</span></p>
+<p>so we take the most probable state <span class="arithmatex">\(j\)</span> occuring at time <span class="arithmatex">\(T\)</span>. We also initialize the observation sequence as:</p>
+<p><span class="arithmatex">\(\bar{O}_T=\underset{j}{\mathrm{argmax}}\ b_T(j)\)</span>.</p>
+<p>Here we take the most probable observation occuring under the current estimation of <span class="arithmatex">\(b\)</span>, given the predicted state of time <span class="arithmatex">\(T+1\)</span>.  <br />
+We can then compute the next elements in respectively the state and observation sequence dynamically as</p>
+<p><span class="arithmatex">\(\bar{S}_{t}=\underset{j}{\mathrm{argmax}}\ (S_tA_j)\)</span></p>
+<p><span class="arithmatex">\(\bar{O}_{t}=\underset{j}{\mathrm{argmax}}\ b_t(j)\)</span></p>
+<p>Here, the normalized vector (sum should equal 1) of <span class="arithmatex">\(S_tA\)</span> is essentially the probability distribution of the next state (we multiply by the transition probability matrix <span class="arithmatex">\(A\)</span>) and we simply take the most probable state <span class="arithmatex">\(j\)</span>, for the value <span class="arithmatex">\(S_t\)</span>, and <span class="arithmatex">\(b_{S_t}(j)\)</span> is the probability of emitting observation <span class="arithmatex">\(j\)</span> given that we were in state <span class="arithmatex">\(S\)</span> at time <span class="arithmatex">\(t\)</span>. We also take the most probable observation here, for obtaining <span class="arithmatex">\(O_t\)</span>.</p>
+<p>We can then simply count the fraction of correctly predicted states and observations by comparing the predictions to the actual "true" values.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": [], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

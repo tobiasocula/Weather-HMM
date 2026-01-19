@@ -1,0 +1,18 @@
+theme:
+  name: material
+
+site_name: NAME OF PROJECT
+
+markdown_extensions:
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.highlight
+  - md_in_html
+  - attr_list
+
+  - pymdownx.arithmatex:
+      generic: true
+  - attr_list
+
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
