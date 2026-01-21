@@ -2,7 +2,15 @@ In the file `weather_hmm_continuous.ipynb` I have reconstructed the weather HMM 
 
 A few interesting things change in the implementation.
 
-Now, instead of $B$ being a static $N\times M$ matrix where $B_{i,k}=\mathbb{P}(\text{emitted observation }k\text{ in state }i)$ (where $N$ is the amount of states and $M$ the amount of observable states), now B is a $T\times M$ matrix where $B_{t,k}=b_t(k)=\mathbb{P}(O_t=o_k\ |\ S_t=k)$. Here, $O_t$ is a stochastic variable following a multivariable Gaussian distribution, with mean $\mu_i$ being the mean observation vector of state $i$ (two components here) and covariance matrix $\Sigma_i$ encoding the interdependence and relative variance between the labels "temperature" and "rain intensity" of state $i$. So we can calculate $b_t(k)$ by computing the PDF function of the multivariate Gaussian distribution with parameters $\mu_i$ and $\Sigma_i$. However, since we are working with logarithms, we will be computing the log of this value.
+Now, instead of $B$ being a static $N\times M$ matrix where $B_{i,k}=\mathbb{P}(\text{emitted observation }k\text{ in state }i)$ (where $N$ is the amount of states and $M$ the amount of observable states), now $B$ is a $T\times N$ matrix where $B_{t,i}=b_t(i)$ is the probability distribution of observation witnessed at time $t$ for state $i$. Here, $O_t$ is a stochastic variable following a multivariable Gaussian distribution, with mean $\mu_i$ being the mean observation vector of state $i$ (two components here) and covariance matrix $\Sigma_i$ encoding the interdependence and relative variance between the labels "temperature" and "rain intensity" of state $i$. So we can calculate $b_t(i)$ by computing the PDF function of the multivariate Gaussian distribution with parameters $\mu_i$ and $\Sigma_i$. However, since we are working with logarithms, we will be computing the log of this value.
+
+We use the formulas
+
+$\mu_i=(\sum_{t=1}^T\gamma_t(i)x_t)/(\sum_{t=1}^T\gamma_t(i))$
+
+$\Sigma_i=(\sum_{t=1}^T\gamma_t(i)(x_t-\mu_t)(x_t-\mu_T)^T)/(\sum_{t=1}^T\gamma_t(i))$
+
+where $x_t$ is the datapoint of dimension $N$ at observed time $t$ (in this case, $N=2$), $\mu_i$ the mean values of the observations for state $i$ and similarly for $\Sigma_i$. So we essentially just take a weighted sum, weighted by the responsibilities $\gamma_t(i)$.   
 
 #### Evaluation
 
