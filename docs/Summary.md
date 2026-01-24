@@ -68,7 +68,7 @@ Now $B\in\mathbb{R}^{T\times N}$ is a time-dependent matrix, defined by $b_t(i)$
 
 $b_t(i)\sim\text{PDF}(x_t\ |\ \theta_i)$
 
-where $\theta_i$ is the parameter set for the probability distribution for state $i$.
+where $\theta_i$ is the parameter set for the probability distribution for state $i$ and $x_t$ the datapoint (observation) at time $t$.
 
 In general:
 
