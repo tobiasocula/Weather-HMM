@@ -110,13 +110,6 @@ $H=(\sum_{t=1}^Ty_tE[x_t]^T)(\sum_{t=1}^TE[x_tx_{t}^T])^{-1}$
 
 $R=\frac{1}{T}\sum_{t=1}^{T}(y_ty_{t}^T-HE[x_t]y_{t}^T-y_tE[x_t]^TH^T+HE[x_tx_{t}^T]H^T)$
 
-##### Analogue to backward-algorithm in HMM
-
-| HMM | LTS |
-| $\beta_t(i)$ | future correction |
-| $\gamma_t(i)$ | smoothed state probabilities |
-| $\xi_t(i,j)$ | cross-time statistics |
-
 #### Moments & Expectation
 
 Next, we compute the three moments of the predicted states $x_t$.
@@ -131,9 +124,78 @@ The notation $P_{t,t-1|T}$ means: the covariance between the state $x_t$ and $x_
 
 The first moment is just the expectation of the predicted state. The second is the outer product of the state with itself, accounting for correlations of the latent state at some time $t$. The third is the cross moment, it uses the cross covariance of RTS and accounts for the relationship between the state at time $t$ and $t-1$. It captures temporal correlation and how the system moves from one state to the next.
 
+#### Full iteration loop and parameter initialization
+
+For the algorithm itself, we just iterate a predetermined amount of times over the below procedure:
+
+1) Determine $x_{\text{filt}}$ and $x_{\text{pred}}$ and their respective covariance matrices $P$ by using the kalman filter, passing the estimated values for $(F,Q,H,R)$.
+
+2) Smoothen $x_{\text{pred}}$ by using the RTS smoother.
+
+3) Compute moments $E[x_tx_{t}^T]$, etc by passing the returned smoothed values for $x$ to the considered function.
+
+4) Estimate the parameters $(F,Q,H,R)$ from the moments from the previous step.
+
+5) Repeat step 1 with the new parameter values.
+
+The initial values of the estimated parameters $(F,Q,H,R)$ can have a big impact on the quality of the outcome estimation. I have discovered that high values for the entries in $Q$ correspond with way better convergence and estimation results.
+
+Low entries in $Q$ (with $H$ having high deviations from the true $H$)
+
+![alt text](assets/lds_lower_Q_higher_H_variance.png)
+
+Lower deviations for $H$
+
+![alt text](assets/lds_lower_Q.png)
+
+Higher values for the entries in $Q$
+
+![alt text](assets/lds_high_Q.png)
+
 ### Switching linear dynamical systems
 
-We can extend the approach discussed in the linear dynamical systems section, and include multiple regimes, each having its own matrices $R_k,F_k$, etc.
+We can now extend the idea of a linear dynamical system, but for multiple states. Thus the latent variables will now consist of a continuous state $x_t$, but as well of a hidden discrete regime $s_t$.
+
+What changes when compared to the standard linear dynamical system implementation?
+
+#### Kalman filter
+
+This step remains mostly the same, except for the fact that we now perform the Kalman filter on the series of observed data $y_t$, and also record the log likelyhood for having observed $y_t$ under regime $k$:
+
+$p(y_t\ |\ y_{1:t-1},s_t=k)=\mathcal{N}(H_kx_{t|t-1}^{(k)},H_kP_{t|t-1}^{(k)}H_{k}^T+R_k)$
+
+where $H_kx_{t|t-1}^{(k)}$ is the predicted mean and $H_kP_{t|t-1}^{(k)}H_{k}^T+R_k$ is the covariance of the error term.
+
+#### EM-step (forward & backward)
+
+For the E-step, we now have two steps: discrete regime inference, and continuous state inference per regime.
+
+For the first part of the E-step, we do almost the exact same as with the Baum-Welch algorithm: we compute $\alpha_t(i)$, $\beta_t(i)$, $\gamma_t(i)$ and $\xi_t(i,j)$ in the exact same way. The only difference is the computation and reasoning behind $\text{log}b_t(i)$: now this is exactly the log likelyhood described above instead of $\text{log}(y_t\ |\ s_t=i)$.
+
+For the second part, we run the Kalman filter and RTS using that regime's parameters and we compute smoothed expectations, and this for each regime. This is the exact same process as for standard LDS, but now for each regime separately.
+
+#### Estimating F, Q, H and R
+
+The only thing that changes compared to LDS here is that we weigh each $F_k$, $Q_k$, $H_k$ and $R_k$ by the regime responsibilities, since we have a parameter set for each regime $k$.
+
+$F_k=(\sum_{t=1}^{T-1}\gamma_t(k)E[x_{t+1}x_{t}^T])(\sum_{t=1}^{T-1}\gamma_t(k)E[x_tx_{t}^T])^{-1}$
+
+$Q_k=\frac{1}{\sum_{t=1}^{T-1}\gamma_t(k)}\sum_{t=1}^{T-1}\gamma_t(k)(E[x_{t+1}x_{t+1}^T]-FE[x_{t+1}x_{t}^T]-E[x_{t+1}x_{t}^T]F^T+FE[x_tx_{t}^T]F^T)$
+
+$H_k=(\sum_{t=1}^T\gamma_t(k)y_tE[x_t]^T)(\sum_{t=1}^T\gamma_t(k)E[x_tx_{t}^T])^{-1}$
+
+$R_k=\frac{1}{\sum_{t=1}^T\gamma_t(k)}\sum_{t=1}^{T}\gamma_t(k)(y_ty_{t}^T-HE[x_t]y_{t}^T-y_tE[x_t]^TH^T+HE[x_tx_{t}^T]H^T)$
+
+| concept | HMM | LTS | SLTS |
+|---|---|---|---|
+| hidden state | discrete regimes | continuous states | discrete regimes + continuous states |
+| $\gamma_t$ | $P(s_t=i | y)$ | not defined | $P(s_t=k | y)$ |
+| $\xi_t$ | $P(s_t=i s_{t+1}=j | y)$ | not defined | probability for regimes |
+
+| HMM | SLTS |
+| $\alpha_t(i)$, $\beta_t(i)$ | forward-backward |
+| $\gamma_t(i)$ | smoothed regime probabilities |
+| $\xi$ | smoothed regime transitions |
 
 #### Concrete example: financial returns data
 
