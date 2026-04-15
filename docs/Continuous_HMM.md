@@ -26,14 +26,14 @@ We will compute the "difference" between $\Sigma_{\text{estimated}}$ and $\Sigma
 $D_{\text{sym}}(P,Q)=D_{KL}(P\ |\ Q)+D_{KL}(Q\ |\ P)$
 
 with $P=\Sigma_{\text{estimated}}$ and $Q=\Sigma_{\text{real}}$, as the measure we will use for permuting the matrices.  
-For the multivariate normal distribution, there exists a close form of this formula:
+For the multivariate normal distribution, there exists a closed formula:
 
 $D_{KL}(\mathcal{N}(\mu_1,\Sigma_1)\ |\ \mathcal{N}(\mu_2,\Sigma_2))=\frac{1}{2}(\text{Tr}(\Sigma_{2}^{-1}\Sigma_{1})+(\mu_2-\mu_1)^T\Sigma_{2}^{-1}(\mu_2-\mu_1)-d+\text{log}(\text{det}\Sigma_2/\text{det}\Sigma_1))$
 
 with $d$ being the dimensionality of the data (2 in this case).  
 We can then construct a distance matrix $C\in\mathbb{R}^{M\times M}$ where
 
-$C_{i,j}=D_{\text{sym}}(\Sigma_{i}^{\text{estimated}}\ |\ \Sigma_{i}^{\text{real}})$
+$C_{i,j}=D_{\text{sym}}(\Sigma_{i}^{\text{estimated}}\ |\ \Sigma_{j}^{\text{real}})$
 
 and then use the Hungarian algorithm on this cost matrix.
 
