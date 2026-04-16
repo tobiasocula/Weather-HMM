@@ -1,7 +1,7 @@
 theme:
   name: material
 
-site_name: NAME OF PROJECT
+site_name: Expectation-Maximalization
 
 markdown_extensions:
   - pymdownx.superfences

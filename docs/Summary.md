@@ -18,43 +18,45 @@ We initialize $A$, $B$, $\pi$.
 
 #### Expectation step
 
+Goal: compute the expected values of the latent variables, given the current estimations of the parameters and the observed data.
+
 ##### Forward algorithm
 
-$\alpha\in\mathbb{R}^{T\times N}$
+$\alpha\in\mathbb{R}^{T\times N}$: probability of the observed data up to time $t$ given we are in state $i$ at time $t$.
 
-$\alpha_t(i)=\mathbb{P}(O_1,\dots,O_t\ |\ S_t=i)$
+$\alpha_t(i)=\mathbb{P}(O_1,\dots,O_t\ |\ S_t=i)$ and
+
+$\alpha_{t}^{scaled}(i)=\frac{\mathbb{P}(O_1,\dots,O_t\ |\ S_t=i)}{\mathbb{P}(O1\dots Ot)}=\mathbb{P}(S_t=i\ |\ O_1,\dots,O_t)$
 
 Compute:
 
-$\alpha_1(i)=\pi_i b_i(O_{t=1})$
+$\alpha_1(i)=\pi_i b_i(O_{t=1})$ and $\alpha_t(i)=b_i(O_{t=t})\sum_j\alpha_{t-1}(j)a_{ij}$
 
-$\alpha_t(i)=b_i(O_{t=t})\sum_j\alpha_{t-1}(i)a_{ij}$
+or with scaling: $\alpha_{t}^{scaled}(i)=\alpha_t(i)/\sum_j\alpha_t(j)$
 
 ##### Backward algorithm
 
-$\beta\in\mathbb{R}^{T\times N}$
+$\beta\in\mathbb{R}^{T\times N}$: probability of the observed data from time $t+1$ to $T$, given we are in state $i$ at time $t$.
 
 $\beta_t(i)=\mathbb{P}(O_{t+1},\dots,O_T\ |\ S_t=i)$
 
 Compute:
 
-$\beta_T(i)=1$
+$\beta_T(i)=1$ and $\beta_t(i)=\sum_j a_{ij}b_j(O_{t+1}\beta_{t+1}(j))$
 
-$\beta_t(i)=\sum_j a_{ij}b_j(O_{t+1}\beta_{t+1}(j))$
+or with scaling: $\beta_{t}^{scaled}(i)=\beta_t(i)/\sum_j\alpha_t(j)$
 
-$\gamma\in\mathbb{R}^{T\times N}$
+$\gamma\in\mathbb{R}^{T\times N}$: probability of being in state $i$ at time $t$, given all observations. One may see this as the posterior distribution over hidden states.
 
 $\gamma_t(i)=\frac{\alpha_t(i)\beta_t(i)}{\sum_j\alpha_t(j)\beta_t(j)}$
 
-$\xi\in\mathbb{R}^{T\times N\times N}$
-
-$\xi_t(i,j)=\frac{\alpha_t(i)a_{ij}b_j(O_{t+1})\beta_{t+1}(j)}{\sum_{k,l}\alpha_t(k)a_{kl}b_l(O_{t+1})\beta_{t+1}(l)}$
+$\xi\in\mathbb{R}^{T\times N\times N}$: probability of transitioning from state $i$ to state $j$ at time $t$, given all observations. $\xi_t(i,j)=\frac{\alpha_t(i)a_{ij}b_j(O_{t+1})\beta_{t+1}(j)}{\sum_{k,l}\alpha_t(k)a_{kl}b_l(O_{t+1})\beta_{t+1}(l)}$
 
 #### Maximalization step
 
-$a_{ij}=\frac{\sum_{t=1}^{T-1}\xi_t(i,j)}{\sum_{t=1}^{T-1}\gamma_t(i)}$
+Goal: esimate system parameters again using results from E-step. Aim to maximize log-likelyhood.
 
-$b_{ik}=\frac{\sum_{t=1}^T\gamma_t(i)1_{O_t=k}}{\sum_{t=1}^T\gamma_t(i)}$
+$a_{ij}=\frac{\sum_{t=1}^{T-1}\xi_t(i,j)}{\sum_{t=1}^{T-1}\gamma_t(i)}$ and $b_{ik}=\frac{\sum_{t=1}^T\gamma_t(i)1_{O_t=k}}{\sum_{t=1}^T\gamma_t(i)}$
 
 ### Log likelyhood
 
