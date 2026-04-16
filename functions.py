@@ -54,9 +54,9 @@ def backward_obs(loga, logb, T, M, scaling, obs):
     logbeta[T - 1, :] = 0
     for t in range(T - 2, -1, -1):
         for i in range(M):
-            logterms = [loga[i, j] + logb[i, obs[t + 1]] + logbeta[t + 1, j] for j in range(M)]
+            logterms = [loga[i, j] + logb[j, obs[t + 1]] + logbeta[t + 1, j] for j in range(M)]
             logbeta[t, i] = np.logaddexp.reduce(logterms)
-        logbeta[t, :] -= scaling[t]
+        #logbeta[t, :] -= scaling[t]
 
     return logbeta
 
@@ -67,24 +67,19 @@ def compute_gamma(logalpha, logbeta, T, M):
             loggamma[t, i] = logalpha[t, i] + logbeta[t, i] - np.logaddexp.reduce([
                 logalpha[t, j] + logbeta[t, j] for j in range(M)
             ])
+            #loggamma[t, i] = logalpha[t, i] + logbeta[t, i]
 
     return loggamma
 
 def compute_xi_obs(logalpha, logbeta, loga, logb, obs, T, M):
-    xi = np.empty((T, M, M))
-    for t in range(T - 1):
+    xi = np.empty((T-1, M, M))  # T-1!
+    for t in range(T-1):
+        # Marginal denominator (same as gamma[t])
+        log_denom = np.logaddexp.reduce([logalpha[t, j] + logbeta[t, j] for j in range(M)])
+        
         for i in range(M):
             for j in range(M):
-                logterms = []
-                for k in range(M):
-                    for l in range(M):
-                        logterms.append(
-                            logalpha[t, k] + loga[k, l] + logb[l, obs[t + 1]] + logbeta[t + 1, l]
-                        )
-                xi[t, i, j] = (
-                    logalpha[t, i] + loga[i, j] + logb[j, obs[t + 1]] + logbeta[t + 1, j]
-                    - np.logaddexp.reduce(logterms)
-                )
+                xi[t, i, j] = logalpha[t, i] + loga[i, j] + logb[j, obs[t+1]] + logbeta[t+1, j] - log_denom
     return xi
 
 def compute_xi(logalpha, logbeta, loga, logb, T, M):
