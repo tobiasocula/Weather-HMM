@@ -53,4 +53,17 @@ $\bar{O}_{t,m}=\pi\mu_{:,m}$
 
 where $\mu_{:,m}$ is the m-th column of $\mu$.
 
+#### Results
+
+Plotting the log-likelyhood values per iteration, we see similar behaviour as with the discrete case.
+
 - ![1](assets/cont_loglikelyhoods.png)
+
+These show the predicted states following the states from the training data.
+
+- ![3](assets/predicted_states_cont.png)
+
+And these by using the Viterbi algorithm.
+
+- ![4](assets/predicted_states_viterbi_cont.png)
+

@@ -96,10 +96,20 @@ $\bar{O}_{t}=\underset{j}{\mathrm{argmax}}\ B_{\bar{S}_{t},j}$
 
 We can then simply count the fraction of correctly predicted states and observations by comparing the predictions to the actual "true" values.
 
+#### Results
+
+The log-likelyhoods evolve as expected: it shows non-decreasing behaviour and ends when the change gets small enough.
+
 - ![1](assets/discrete_loglikelyhoods.png)
+
+The errors in the estimation of the parameters $A$ and $B$ differ greatly between attempts: this is expected because the algorithm only finds local maxima, thus many initializations make the system evolve into a non-desirable estimation of the parameters.
 
 - ![2](assets/errors_AB_discrete.png)
 
+Below are the prediction accuracies of the states that come after the ones from the training period.
+
 - ![4](assets/predicted_states_obs_discrete.png)
+
+Below also shows the prediction accuraries of the guesses as well, but using the Viterbi-algorithm instead. Predictions are clearly more accurate using this method.
 
 - ![5](assets/predicted_states_obs_discrete_viterbi.png)

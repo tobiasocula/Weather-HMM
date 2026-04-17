@@ -131,6 +131,11 @@ def permute_model(pi, A, mus, Sigmas, perm):
     return pi_r, A_r, mus_r, Sigmas_r
 
 def kl_gaussian(mu0, S0, mu1, S1, eps=1e-8):
+    print('DEBUG KL')
+    print(mu0)
+    print(S0)
+    print(mu1)
+    print(S1)
     # KL(N0 || N1)
     d = mu0.shape[0]
     # regularize
@@ -139,7 +144,8 @@ def kl_gaussian(mu0, S0, mu1, S1, eps=1e-8):
     invS1 = np.linalg.inv(S1)
     diff = (mu1 - mu0).reshape(-1, 1)
     term_trace = np.trace(invS1 @ S0)
-    term_quad = float(diff.T @ invS1 @ diff)
+    term_quad = (diff.T @ invS1 @ diff).flatten()[0]
+    print('term quad:'); print(term_quad)
     # sign and natural log of determinant
     sign0, logdet0 = np.linalg.slogdet(S0)
     sign1, logdet1 = np.linalg.slogdet(S1)
