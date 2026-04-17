@@ -61,7 +61,7 @@ I first assume the model has access to the future observation sequence, and I wi
 
 https://en.wikipedia.org/wiki/Viterbi_algorithm
 
-For this, I store two structures $\delta,\psi\in\mathbb{R}^{T\times N}$, where $\delta_t(i)$ represents the maximum probability, over all possible state sequences, of seeing these states under the respected observation states, where the state at time $t-1$ ends in $i$, given the estimated parameters. So    
+For this, I store two structures $\delta,\psi\in\mathbb{R}^{T\times N}$, where $\delta_t(i)$ represents the maximum probability, over all possible state sequences, of seeing these states under the respective observation states, where the state at time $t-1$ ends in $i$, given the estimated parameters. So    
 $\delta_t(i)=\underset{S_0,...,S_{t-1}}\max\mathbb{P}(S_0,S_1,...,S_{t-1}=i,O_1,...,O_T\ |\ \theta)$  
 I initialize $\delta_1(i)=\pi_ib_i(O_1)$ and then run over all future timestamps $t=T+1$ until $t=T_{\text{tend}}$, where I calculate dynamically:  
 $\delta_t(i)=\underset{j}\max(\delta_{t-1}(j)a_{i,j})b_i(O_t)$  
@@ -88,13 +88,18 @@ so we take the most probable state $j$ occuring at time $T$. We also initialize 
 
 $\bar{O}_T=\underset{j}{\mathrm{argmax}}\ b_T(j)$.
 
-Here we take the most probable observation occuring under the current estimation of $b$, given the predicted state of time $T+1$.    
-We can then compute the next elements in respectively the state and observation sequence dynamically as
+Here we take the most probable observation occuring under the current estimation of $b$, given the predicted state of time $T+1$. For the next timesteps, we can update the estimated distribution of states by doing $p_{t+1}=p_tA$, and then computing
 
-$\bar{S}_{t}=\underset{j}{\mathrm{argmax}}\ (S_tA_j)$
+$\bar{S}_{t}=\underset{j}{\mathrm{argmax}}\ (p_t)_j$
 
-$\bar{O}_{t}=\underset{j}{\mathrm{argmax}}\ b_t(j)$
-
-Here, the normalized vector (sum should equal 1) of $S_tA$ is essentially the probability distribution of the next state (we multiply by the transition probability matrix $A$) and we simply take the most probable state $j$, for the value $S_t$, and $b_{S_t}(j)$ is the probability of emitting observation $j$ given that we were in state $S$ at time $t$. We also take the most probable observation here, for obtaining $O_t$.
+$\bar{O}_{t}=\underset{j}{\mathrm{argmax}}\ B_{\bar{S}_{t},j}$
 
 We can then simply count the fraction of correctly predicted states and observations by comparing the predictions to the actual "true" values.
+
+- ![1](assets/discrete_loglikelyhoods.png)
+
+- ![2](assets/errors_AB_discrete.png)
+
+- ![4](assets/predicted_states_obs_discrete.png)
+
+- ![5](assets/predicted_states_obs_discrete_viterbi.png)
